@@ -1,17 +1,26 @@
 ﻿using CC.Managers.Utility;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CC.Managers
 {
+    [System.Serializable]
+    public class HCLevel
+    {
+
+        public GameObject levelPrefab;
+        public int necessaryCubeNumber;
+    }
     public class HCLevelManager : SingletonMono<HCLevelManager>
     {
-        [SerializeField] private GameObject[] _levelPrefabs;
+        public List<HCLevel> _levelPrefabs;
         [SerializeField] internal int _levelIndex = 0;
         [SerializeField] internal bool _forceLevel = false;
 
         private int _globalLevelIndex = 0;
         private bool _inited = false;
         internal GameObject _currentLevel;
+        internal int _necessaryCubeNumber = 0;
 
         public void Init()
         {
@@ -28,9 +37,9 @@ namespace CC.Managers
                 return;
             }
             _levelIndex = _globalLevelIndex;
-            if (_levelIndex >= _levelPrefabs.Length)
+            if (_levelIndex >= _levelPrefabs.Count)
             {
-                _levelIndex = GameUtility.RandomIntExcept(_levelPrefabs.Length, _levelIndex, 0);
+                _levelIndex = GameUtility.RandomIntExcept(_levelPrefabs.Count, _levelIndex, 0);
             }
         }
         public void GenerateCurrentLevel()
@@ -39,8 +48,8 @@ namespace CC.Managers
             {
                 Destroy(_currentLevel);
             }
-            _currentLevel = Instantiate(_levelPrefabs[_levelIndex]);
-            //HomaGames.HomaBelly.DefaultAnalytics.LevelStarted(_globalLevelIndex);
+            _currentLevel = Instantiate(_levelPrefabs[_levelIndex].levelPrefab);
+            _necessaryCubeNumber = _levelPrefabs[_levelIndex].necessaryCubeNumber;
         }
 
         public GameObject GetCurrentLevel()
@@ -58,15 +67,20 @@ namespace CC.Managers
             _globalLevelIndex++;
             PlayerPrefs.SetInt("HCLevel", _globalLevelIndex);
             _levelIndex = _globalLevelIndex;
-            if (_levelIndex >= _levelPrefabs.Length)
+            if (_levelIndex >= _levelPrefabs.Count)
             {
-                _levelIndex = GameUtility.RandomIntExcept(_levelPrefabs.Length, _levelIndex);
+                _levelIndex = GameUtility.RandomIntExcept(_levelPrefabs.Count, _levelIndex);
             }
             Debug.Log(_levelIndex);
         }
         public int GetGlobalLevelIndex()
         {
             return _globalLevelIndex;
+        }
+
+        public int GetNecessaryCubeNumber()
+        {
+            return _necessaryCubeNumber;
         }
     }
 }

@@ -7,9 +7,7 @@ namespace CC.Picker.Controller
     public class JoystickController : MonoBehaviour
     {
         [SerializeField] private Joystick joystick;
-        [SerializeField] private float speed = 10.0f;
-        [SerializeField] private float rotationSpeed = 5.0f;
-        [SerializeField] private float smoothTime = 0.3f;
+        [SerializeField] private PlayerDataScriptableObject _playerData;
 
         private bool movementEnable = true;
 
@@ -33,7 +31,7 @@ namespace CC.Picker.Controller
 
             currentDirection = new Vector3(horizontalInput, 0, verticalInput);
 
-            if (currentDirection != previousDirection)
+            if (currentDirection != previousDirection && currentDirection.magnitude > 0)
             {
                 Movement();
 
@@ -51,7 +49,8 @@ namespace CC.Picker.Controller
 
         private void Movement()
         {
-            rb.velocity = Vector3.SmoothDamp(rb.velocity, currentDirection * speed, ref velocity, smoothTime);
+
+            rb.velocity = Vector3.SmoothDamp(rb.velocity, currentDirection * (_playerData.moveSpeed + _playerData.acceleration * (1/currentDirection.magnitude)), ref velocity, _playerData.moveSmoothness);
         }
 
         private void GetInputs()

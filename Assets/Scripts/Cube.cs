@@ -7,24 +7,35 @@ namespace CC.Cube
 {
     public class Cube : MonoBehaviour
     {
-        private Physics.CubePhysics cubePhysics;
+        private Mechanics.CubePhysics cubePhysics;
         private Rigidbody rb;
         private void Awake()
         {
             rb = GetComponent<Rigidbody>();
-            cubePhysics = GetComponent<Physics.CubePhysics>();
+            cubePhysics = GetComponent<Mechanics.CubePhysics>();
+        }
+        private void FixedUpdate()
+        {
+            cubePhysics.ClampHeight(); // Prevent jump higher
         }
         private void OnCollisionEnter(Collision collision)
         {
-            /* Prevent jump over the picker */
+            if (collision.gameObject.CompareTag("Picker"))
+            {
+                // Preserve fall from the picker
 
-            cubePhysics.PushOnGround();
+                cubePhysics.PushWithDirection(-collision.gameObject.transform.forward);
+            }
+
+            cubePhysics.PushOnGround(); // Prevent jump over the picker
         }
         private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("BlackHole"))
             {
-                /* BlackHole Catch */
+                // BlackHole Catch
+
+                GetComponentInChildren<MeshCollider>().gameObject.layer = 6; //Ignore Collision layer
 
                 cubePhysics.CatchByBlackHole(other.gameObject);
             }

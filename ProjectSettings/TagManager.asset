@@ -7,14 +7,15 @@ TagManager:
   - Floor
   - Cube
   - BlackHole
+  - Picker
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - PickerLayer
   - Water
   - UI
-  - 
+  - IgnoreCollision
   - 
   - 
   - 
