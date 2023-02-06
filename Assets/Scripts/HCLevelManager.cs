@@ -10,6 +10,7 @@ namespace CC.Managers
 
         public GameObject levelPrefab;
         public int necessaryCubeNumber;
+        public int time;
     }
     public class HCLevelManager : SingletonMono<HCLevelManager>
     {
@@ -20,7 +21,6 @@ namespace CC.Managers
         private int _globalLevelIndex = 0;
         private bool _inited = false;
         internal GameObject _currentLevel;
-        internal int _necessaryCubeNumber = 0;
 
         public void Init()
         {
@@ -30,7 +30,7 @@ namespace CC.Managers
             }
             _inited = true;
             //PlayerPrefs.DeleteAll();
-            _globalLevelIndex = PlayerPrefs.GetInt("HCLevel");
+            _globalLevelIndex = PlayerPrefs.GetInt("HCLevel" + GameManager.Instance.gameMode.ToString());
             if (_forceLevel)
             {
                 _globalLevelIndex = _levelIndex;
@@ -49,7 +49,6 @@ namespace CC.Managers
                 Destroy(_currentLevel);
             }
             _currentLevel = Instantiate(_levelPrefabs[_levelIndex].levelPrefab);
-            _necessaryCubeNumber = _levelPrefabs[_levelIndex].necessaryCubeNumber;
         }
 
         public GameObject GetCurrentLevel()
@@ -65,7 +64,7 @@ namespace CC.Managers
                 return;
             }
             _globalLevelIndex++;
-            PlayerPrefs.SetInt("HCLevel", _globalLevelIndex);
+            PlayerPrefs.SetInt("HCLevel" + GameManager.Instance.gameMode.ToString(), _globalLevelIndex);
             _levelIndex = _globalLevelIndex;
             if (_levelIndex >= _levelPrefabs.Count)
             {
@@ -80,7 +79,11 @@ namespace CC.Managers
 
         public int GetNecessaryCubeNumber()
         {
-            return _necessaryCubeNumber;
+            return _levelPrefabs[_levelIndex].necessaryCubeNumber;
+        }
+        public int GetTimeLimit()
+        {
+            return _levelPrefabs[_levelIndex].time;
         }
     }
 }

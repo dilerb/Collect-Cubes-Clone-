@@ -49,7 +49,6 @@ namespace CC.Picker.Controller
 
         private void Movement()
         {
-
             rb.velocity = Vector3.SmoothDamp(rb.velocity, currentDirection * (_playerData.moveSpeed + _playerData.acceleration * (1/currentDirection.magnitude)), ref velocity, _playerData.moveSmoothness);
         }
 

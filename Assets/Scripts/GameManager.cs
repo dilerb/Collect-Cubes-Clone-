@@ -7,9 +7,20 @@ namespace CC.Managers
 {
     public class GameManager : SingletonMono<GameManager>
     {
-        public bool gameOver = false;
+        public enum GameMode
+        {
+            Classic,
+            TimeChallange,
+            RivalAI
+        }
+
+        [SerializeField] public GameMode gameMode;
+
+        internal bool gameOver = false;
         private int currentLevel;
         private int collectedCubeCount = 0;
+        private int collectedCubeCountByAI = 0;
+        private int initialTimeLimit = 0;
 
         private void Start()
         {
@@ -24,14 +35,21 @@ namespace CC.Managers
         }
         private void Init()
         {
+            ObjectPooler.Instance.Init();
             currentLevel = GetLevel();
+            initialTimeLimit = HCLevelManager.Instance.GetTimeLimit();
             UIManager.Instance.SetLevel(currentLevel);
-            gameOver = true;
+
+            StartGame();
         }
         public void StartGame()
         {
             gameOver = false;
-            Time.timeScale = 1f;
+            //Time.timeScale = 1f;
+            CubeSpawner.Instance.StartSpawn(gameMode);
+
+            if (gameMode == GameMode.TimeChallange || gameMode == GameMode.RivalAI)
+                Timer.Instance.StartTimer(initialTimeLimit);
         }
         public void Restart()
         {
@@ -54,7 +72,16 @@ namespace CC.Managers
         public void GameOver()
         {
             gameOver = true;
-            UIManager.Instance.OpenLosePanel();
+
+            if (gameMode == GameMode.TimeChallange)
+            {
+                CubeSpawner.Instance.StopSpawn();
+                UIManager.Instance.OpenWinPanel();
+            }
+            else
+            {
+                UIManager.Instance.OpenLosePanel();
+            }
         }
         private int GetLevel()
         {
@@ -64,9 +91,32 @@ namespace CC.Managers
         {
             collectedCubeCount++;
 
-            if (collectedCubeCount >= HCLevelManager.Instance.GetNecessaryCubeNumber())
+            CheckWinLose();
+        }
+        internal void IncreaseCollectedCubeCountByAI()
+        {
+            collectedCubeCountByAI++;
+
+            CheckWinLose();
+        }
+
+        private void CheckWinLose()
+        {
+            if (gameMode == GameMode.Classic)
             {
-                UIManager.Instance.OpenWinPanel();
+                if (collectedCubeCount >= HCLevelManager.Instance.GetNecessaryCubeNumber())
+                {
+                    UIManager.Instance.OpenWinPanel();
+                }
+            }
+            else if(gameMode == GameMode.TimeChallange)
+            {
+                UIManager.Instance.SetPlayerScore(collectedCubeCount);
+            }
+            else if (gameMode == GameMode.RivalAI)
+            {
+                UIManager.Instance.SetPlayerScore(collectedCubeCount);
+                UIManager.Instance.SetAiScore(collectedCubeCountByAI);
             }
         }
     }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static CC.Managers.GameManager;
 
 namespace CC.Managers
 {
@@ -9,32 +10,54 @@ namespace CC.Managers
         [SerializeField] private int poolIndex = 0;
         [SerializeField] private float spawnInterval = 1f;
         [SerializeField] private float spawnRadius = 1f;
+        [SerializeField] private int initialBurst = 100;
         [SerializeField] private int burstCount = 10;
 
         [SerializeField] private Texture2D image;
-        private void Start()
-        {
-            //Invoke("SpawnObjectsBurstMode", 0.5f);
-            //InvokeRepeating("SpawnObject", 5f, spawnInterval);
-            
-            //Invoke("SpawnAccordingImage", 0.5f);
-        }
 
-        private void SpawnObjectsBurstMode()
+        private bool spawnerEnable = false;
+        internal void StartSpawn(GameMode _mode)
         {
-            for (int i=0; i<burstCount; i++)
+            spawnerEnable = true;
+
+            if (_mode == GameMode.Classic)
             {
-                SpawnObject();
+                //Invoke("SpawnAccordingImage", 0.5f);
+            }
+            else if (_mode == GameMode.TimeChallange)
+            {
+                StartCoroutine(SpawnObject(burstCount, 0));
+                StartCoroutine(SpawnObject(burstCount, spawnInterval));
+            }
+            else if (_mode == GameMode.RivalAI)
+            {
+                Invoke("SpawnObjectsBurstMode", 0.5f);
+                StartCoroutine(SpawnObject(burstCount, spawnInterval));
             }
         }
-        private void SpawnObject()
+
+        IEnumerator SpawnObject(int burst, float interval)
         {
-            GameObject obj = ObjectPooler.Instance.GetPooledObject(poolIndex);
-            obj.transform.position = new Vector3(transform.position.x + Random.Range(-spawnRadius, spawnRadius), transform.position.y, transform.position.z + Random.Range(-spawnRadius, spawnRadius));
-            obj.transform.rotation = transform.rotation;
-            obj.SetActive(true);
+            while (spawnerEnable)
+            {
+                if (burst == 0)
+                    burst = burstCount;
+
+                for (int i = 0; i < burst; i++)
+                {
+                    GameObject obj = ObjectPooler.Instance.GetPooledObject(poolIndex);
+                    obj.transform.position = new Vector3(transform.position.x + Random.Range(-spawnRadius, spawnRadius), transform.position.y, transform.position.z + Random.Range(-spawnRadius, spawnRadius));
+                    obj.transform.rotation = transform.rotation;
+                    obj.SetActive(true);
+                }
+
+                if (spawnInterval == 0)
+                    break;
+                else
+                    yield return new WaitForSeconds(spawnInterval);
+            }
         }
-        private void SpawnAccordingImage()
+        internal void SpawnAccordingImage()
         {
             Color[] pixels = image.GetPixels();
             int width = image.width;
@@ -56,6 +79,11 @@ namespace CC.Managers
                     //cube.GetComponent<Renderer>().material.color = pixelColor;
                 }
             }
+        }
+
+        internal void StopSpawn()
+        {
+            spawnerEnable = false;
         }
 
         internal void DestroyObject(GameObject go)

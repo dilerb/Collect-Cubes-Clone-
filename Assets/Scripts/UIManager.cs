@@ -16,6 +16,9 @@ namespace CC.Managers
         [SerializeField] private GameObject loseLevelText;
         [SerializeField] private GameObject mainMenuLevelText;
 
+        [SerializeField] private GameObject playerScoreText;
+        [SerializeField] private GameObject aiScoreText;
+
         [SerializeField] private Timer timer;
 
         public void SetLevel(int currentLevel)
@@ -44,6 +47,15 @@ namespace CC.Managers
         {
             joystick.SetActive(false);
             winPanel.SetActive(true);
+        }
+
+        public void SetPlayerScore(int score)
+        {
+            playerScoreText.GetComponent<TextMesh>().text = score.ToString();
+        }
+        public void SetAiScore(int score)
+        {
+            aiScoreText.GetComponent<TextMesh>().text = score.ToString();
         }
     }
 }

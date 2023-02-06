@@ -29,7 +29,7 @@ namespace CC.Managers
 		public List<GameObject> pooledObjects;
 		private List<int> positions;
 
-		private void Start()
+		internal void Init()
 		{
 			pooledObjectsList = new List<List<GameObject>>();
 			pooledObjects = new List<GameObject>();

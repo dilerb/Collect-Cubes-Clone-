@@ -6,22 +6,20 @@ using System;
 
 namespace CC.Managers
 {
-
-    public class Timer : MonoBehaviour
+    public class Timer : SingletonMono<Timer>
     {
+        [SerializeField] private TextMeshProUGUI timerText;
+
         public float timeRemaining = 10;
         public bool timerIsRunning = false;
-
-        private TextMeshProUGUI timerText;
-        private void Start()
+        public void StartTimer(float t)
         {
-            timerText = GetComponent<TextMeshProUGUI>();
-
+            timeRemaining = t;
             SetTimerText();
 
             timerIsRunning = true;
         }
-        void Update()
+        private void Update()
         {
             if (timerIsRunning)
             {
@@ -33,20 +31,25 @@ namespace CC.Managers
                 else
                 {
                     Debug.Log("Time has run out!");
+
                     timeRemaining = 0;
                     timerIsRunning = false;
+
+                    GameManager.Instance.GameOver();
                 }
             }
         }
 
         private void SetTimerText()
         {
-            timerText.text = ((int)timeRemaining).ToString();
+            int minutes = (int)timeRemaining / 60;
+            int seconds = (int)timeRemaining % 60;
+            timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
 
             if (timeRemaining <= 5)
                 timerText.color = Color.red;
             else
-                timerText.color = Color.white;
+                timerText.color = Color.black;
         }
     }
 }
