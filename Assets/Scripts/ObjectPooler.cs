@@ -4,7 +4,53 @@ using UnityEngine;
 
 namespace CC.Managers
 {
+	public class ObjectPooler : SingletonMono<ObjectPooler>
+    {
+		[SerializeField] private GameObject poolPrefab;
+		[SerializeField] private GameObject poolObjects;
+		[SerializeField] private GameObject createdObjects;
 
+		private Queue<GameObject> pooledObjects;
+		internal void Init()
+		{
+			pooledObjects = new Queue<GameObject>();
+		}
+		internal GameObject InstantiateFromPool(Vector3 pos)
+        {
+			if (pooledObjects.Count == 0)
+            {
+				return Instantiate(poolPrefab, pos, Quaternion.identity, createdObjects.transform);
+            }
+            else
+            {
+				GameObject returnObj = pooledObjects.Dequeue();
+				returnObj.GetComponentInChildren<MeshCollider>().gameObject.layer = 0; //Default Collision layer
+				returnObj.SetActive(true);
+				returnObj.transform.SetParent(createdObjects.transform);
+				returnObj.transform.position = pos;
+				returnObj.transform.localScale = Vector3.one;
+				returnObj.GetComponent<Rigidbody>().isKinematic = false;
+
+				return returnObj;
+            }
+        }
+		internal void DestroyIntoPool(GameObject go)
+		{
+			go.GetComponent<Rigidbody>().isKinematic = true;
+			go.SetActive(false);
+			go.transform.SetParent(poolObjects.transform);
+			pooledObjects.Enqueue(go);
+        }
+
+		internal GameObject GetCreateObjectParent()
+        {
+			return createdObjects;
+
+		}
+    }
+
+
+	/*
 	[System.Serializable]
 	public class ObjectPoolItem
 	{
@@ -16,7 +62,7 @@ namespace CC.Managers
 		public ObjectPoolItem(GameObject obj, int amt, bool exp = true)
 		{
 			objectToPool = obj;
-			amountToPool = Mathf.Max(amt, 2);
+			amountToPool = Mathf.Max(amt, 1);
 			shouldExpand = exp;
 		}
 	}
@@ -36,10 +82,10 @@ namespace CC.Managers
 			positions = new List<int>();
 
 
-			for (int i = 0; i < itemsToPool.Count; i++)
-			{
-				ObjectPoolItemToPooledObject(i);
-			}
+			//for (int i = 0; i < itemsToPool.Count; i++)
+			//{
+			//	ObjectPoolItemToPooledObject(i);
+			//}
 		}
 
 
@@ -85,7 +131,7 @@ namespace CC.Managers
 			return currLen;
 		}
 
-		void ObjectPoolItemToPooledObject(int index)
+		public void ObjectPoolItemToPooledObject(int index) //Create object into the pool
 		{
 			ObjectPoolItem item = itemsToPool[index];
 
@@ -101,5 +147,5 @@ namespace CC.Managers
 			positions.Add(0);
 
 		}
-	}
+	}*/
 }

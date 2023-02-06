@@ -15,20 +15,29 @@ namespace CC.Cube.Mechanics
         {
             rb = GetComponent<Rigidbody>();
         }
-        internal void CatchByBlackHole(GameObject bh)
+        internal void CatchByBlackHole(GameObject bh,bool isAI)
         {
-            StartCoroutine(Co_CatchByBlackHole(bh));
+            StartCoroutine(Co_CatchByBlackHole(bh, isAI));
         }
 
-        IEnumerator Co_CatchByBlackHole(GameObject bh)
+        IEnumerator Co_CatchByBlackHole(GameObject bh, bool isAI)
         {
             //Change color
-            //ignore collision
+
+            GetComponentInChildren<MeshCollider>().gameObject.layer = 6; //Ignore Collision layer
+
             yield return transform.DOMove(bh.transform.position, _cubeData.blackHoleCatchDuration);
             yield return transform.DOScale(_cubeData.blackHoleMinimizeFactor, _cubeData.blackHoleCatchDuration).WaitForCompletion();
             CubeSpawner.Instance.DestroyObject(gameObject);
 
-            GameManager.Instance.IncreaseCollectedCubeCount();
+            if (isAI)
+            {
+                GameManager.Instance.IncreaseCollectedCubeCountByAI();
+            }
+            else
+            {
+                GameManager.Instance.IncreaseCollectedCubeCount();
+            }
         }
 
         internal void PushOnGround()
@@ -42,7 +51,7 @@ namespace CC.Cube.Mechanics
 
         internal void ClampHeight()
         {
-            transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, 0f, _cubeData.clampHeightValue), transform.position.z);
+            transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -0.5f, _cubeData.clampHeightValue), transform.position.z);
         }
     }
 }

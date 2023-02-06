@@ -45,10 +45,7 @@ namespace CC.Managers
 
                 for (int i = 0; i < burst; i++)
                 {
-                    GameObject obj = ObjectPooler.Instance.GetPooledObject(poolIndex);
-                    obj.transform.position = new Vector3(transform.position.x + Random.Range(-spawnRadius, spawnRadius), transform.position.y, transform.position.z + Random.Range(-spawnRadius, spawnRadius));
-                    obj.transform.rotation = transform.rotation;
-                    obj.SetActive(true);
+                    GameObject obj = ObjectPooler.Instance.InstantiateFromPool(new Vector3(transform.position.x + Random.Range(-spawnRadius, spawnRadius), transform.position.y, transform.position.z + Random.Range(-spawnRadius, spawnRadius)));
                 }
 
                 if (spawnInterval == 0)
@@ -70,10 +67,8 @@ namespace CC.Managers
                     int index = y * width + x;
                     Color pixelColor = pixels[index];
 
-                    GameObject obj = ObjectPooler.Instance.GetPooledObject(poolIndex);
+                    GameObject obj = ObjectPooler.Instance.InstantiateFromPool(new Vector3(x, 0, y));
                     obj.GetComponent<Rigidbody>().isKinematic = true;
-                    obj.transform.position = new Vector3(x, 0, y);
-                    obj.transform.rotation = transform.rotation;
                     obj.SetActive(true);
 
                     //cube.GetComponent<Renderer>().material.color = pixelColor;
@@ -88,7 +83,7 @@ namespace CC.Managers
 
         internal void DestroyObject(GameObject go)
         {
-            ObjectPooler.Instance.AddObject(go, 1, true);
+            ObjectPooler.Instance.DestroyIntoPool(go);
         }
     }
 }

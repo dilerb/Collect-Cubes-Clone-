@@ -19,7 +19,7 @@ namespace CC.Managers
         [SerializeField] private GameObject playerScoreText;
         [SerializeField] private GameObject aiScoreText;
 
-        [SerializeField] private Timer timer;
+        //[SerializeField] private Timer timer;
 
         public void SetLevel(int currentLevel)
         {

@@ -5,12 +5,20 @@ using UnityEngine;
 
 namespace CC.Cube
 {
+    public enum State
+    {
+        Free,
+        CatchByPlayer,
+        CatchByAI
+    }
     public class Cube : MonoBehaviour
     {
         private Mechanics.CubePhysics cubePhysics;
         private Rigidbody rb;
+        private State _state;
         private void Awake()
         {
+            _state = State.Free;
             rb = GetComponent<Rigidbody>();
             cubePhysics = GetComponent<Mechanics.CubePhysics>();
         }
@@ -31,13 +39,41 @@ namespace CC.Cube
         }
         private void OnTriggerEnter(Collider other)
         {
-            if (other.CompareTag("BlackHole"))
+            if (other.CompareTag("BlackHole")
+                && (Managers.GameManager.Instance.gameMode != Managers.GameManager.GameMode.RivalAI || _state != State.Free))
             {
                 // BlackHole Catch
 
-                GetComponentInChildren<MeshCollider>().gameObject.layer = 6; //Ignore Collision layer
+                cubePhysics.CatchByBlackHole(other.gameObject, false);
+            }
+            else if (other.CompareTag("BlackHoleAI") && _state != State.Free)
+            {
+                // BlackHoleAI Catch
 
-                cubePhysics.CatchByBlackHole(other.gameObject);
+                cubePhysics.CatchByBlackHole(other.gameObject, true);
+            }
+        }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (other.CompareTag("Picker"))
+            {
+                _state = State.CatchByPlayer;
+                GetComponentInChildren<MeshCollider>().gameObject.layer = 3; //picker Collision layer
+            }
+            else if (other.CompareTag("PickerAI"))
+            {
+                _state = State.CatchByAI;
+                GetComponentInChildren<MeshCollider>().gameObject.layer = 7; //ai Collision layer
+            }
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Picker") || other.CompareTag("PickerAI"))
+            {
+                _state = State.Free;
+                GetComponentInChildren<MeshCollider>().gameObject.layer = 0; //Default Collision layer
             }
         }
     }

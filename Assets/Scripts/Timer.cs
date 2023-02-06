@@ -46,7 +46,7 @@ namespace CC.Managers
             int seconds = (int)timeRemaining % 60;
             timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
 
-            if (timeRemaining <= 5)
+            if (timeRemaining <= 10)
                 timerText.color = Color.red;
             else
                 timerText.color = Color.black;

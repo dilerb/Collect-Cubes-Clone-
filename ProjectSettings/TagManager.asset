@@ -8,6 +8,8 @@ TagManager:
   - Cube
   - BlackHole
   - Picker
+  - BlackHoleAI
+  - PickerAI
   layers:
   - Default
   - TransparentFX

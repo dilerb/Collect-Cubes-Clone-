@@ -15,6 +15,7 @@ namespace CC.Managers
         }
 
         [SerializeField] public GameMode gameMode;
+        [SerializeField] private GameObject ai;
 
         internal bool gameOver = false;
         private int currentLevel;
@@ -48,8 +49,15 @@ namespace CC.Managers
             //Time.timeScale = 1f;
             CubeSpawner.Instance.StartSpawn(gameMode);
 
-            if (gameMode == GameMode.TimeChallange || gameMode == GameMode.RivalAI)
+            if (gameMode == GameMode.TimeChallange)
+            {
                 Timer.Instance.StartTimer(initialTimeLimit);
+            }
+            else if (gameMode == GameMode.RivalAI)
+            {
+                Timer.Instance.StartTimer(initialTimeLimit);
+                ai.GetComponent<AI.Controller.AIController>().Init();
+            }
         }
         public void Restart()
         {
@@ -73,14 +81,10 @@ namespace CC.Managers
         {
             gameOver = true;
 
-            if (gameMode == GameMode.TimeChallange)
+            if (gameMode == GameMode.TimeChallange || gameMode == GameMode.RivalAI)
             {
                 CubeSpawner.Instance.StopSpawn();
-                UIManager.Instance.OpenWinPanel();
-            }
-            else
-            {
-                UIManager.Instance.OpenLosePanel();
+                CheckWinLose();
             }
         }
         private int GetLevel()
@@ -91,13 +95,31 @@ namespace CC.Managers
         {
             collectedCubeCount++;
 
-            CheckWinLose();
+            if (gameMode == GameMode.Classic)
+            {
+                CheckWinLose();
+            }
+            else if (gameMode == GameMode.TimeChallange)
+            {
+                UIManager.Instance.SetPlayerScore(collectedCubeCount);
+            }
+            else if (gameMode == GameMode.RivalAI)
+            {
+                UIManager.Instance.SetPlayerScore(collectedCubeCount);
+            }
         }
         internal void IncreaseCollectedCubeCountByAI()
         {
             collectedCubeCountByAI++;
 
-            CheckWinLose();
+            if (gameMode == GameMode.TimeChallange)
+            {
+                UIManager.Instance.SetPlayerScore(collectedCubeCount);
+            }
+            else if (gameMode == GameMode.RivalAI)
+            {
+                UIManager.Instance.SetAiScore(collectedCubeCountByAI);
+            }
         }
 
         private void CheckWinLose()
@@ -111,12 +133,18 @@ namespace CC.Managers
             }
             else if(gameMode == GameMode.TimeChallange)
             {
-                UIManager.Instance.SetPlayerScore(collectedCubeCount);
+                UIManager.Instance.OpenWinPanel();
             }
             else if (gameMode == GameMode.RivalAI)
             {
-                UIManager.Instance.SetPlayerScore(collectedCubeCount);
-                UIManager.Instance.SetAiScore(collectedCubeCountByAI);
+                if (collectedCubeCount > collectedCubeCountByAI)
+                {
+                    UIManager.Instance.OpenWinPanel();
+                }
+                else
+                {
+                    UIManager.Instance.OpenLosePanel();
+                }
             }
         }
     }
