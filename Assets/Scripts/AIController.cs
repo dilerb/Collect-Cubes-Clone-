@@ -9,7 +9,6 @@ namespace CC.AI.Controller
     {
         [SerializeField] private AIDataScriptableObject _aiData;
         [SerializeField] private GameObject blackHole;
-        //[SerializeField] private NavMeshAgent agent;
 
         private GameObject cubePool;
         private Vector3 destination;
@@ -32,7 +31,7 @@ namespace CC.AI.Controller
 
             AIRotation();
 
-            if (Vector3.Distance(transform.position, destination) < _aiData.distanceBetweenDestination)
+            if (Vector3.Distance(transform.position, destination) < _aiData.arriveDistance) //arrive the destination
             {
                 FindDestination();
             }
@@ -41,7 +40,6 @@ namespace CC.AI.Controller
         private void AIMovement()
         {
             rb.velocity = (destination - transform.position).normalized * _aiData.moveSpeed;
-            //transform.position = Vector3.MoveTowards(transform.position, destination, _aiData.moveSpeed * Time.deltaTime);
         }
 
         private void AIRotation()
@@ -60,13 +58,19 @@ namespace CC.AI.Controller
                     targetCubePos = cubePool.transform.GetChild(Random.Range(0, cubePool.transform.childCount)).position;
                 }
 
-                destination = new Vector3(targetCubePos.x, transform.position.y, targetCubePos.z);
+                // Get a fit destination
 
-                if (Random.Range(0, 2) == 0) // Collect another cube possibility
+                destination = new Vector3(Mathf.Clamp(targetCubePos.x, -3.5f, 3.5f), transform.position.y, Mathf.Clamp(targetCubePos.z, -5.5f, 5.5f));
+                
+                // Collect another cube possibility
+
+                if (Random.Range(0, 2) == 0)
                     targetCube = false;
             }
             else
             {
+                // Set destination to blackhole
+
                 destination = new Vector3(blackHole.transform.position.x, transform.position.y, blackHole.transform.position.z);
 
                 targetCube = true;

@@ -28,6 +28,7 @@ namespace CC.Managers
             {
                 return;
             }
+
             _inited = true;
             //PlayerPrefs.DeleteAll();
             _globalLevelIndex = PlayerPrefs.GetInt("HCLevel" + GameManager.Instance.gameMode.ToString());
@@ -39,7 +40,7 @@ namespace CC.Managers
             _levelIndex = _globalLevelIndex;
             if (_levelIndex >= _levelPrefabs.Count)
             {
-                _levelIndex = GameUtility.RandomIntExcept(_levelPrefabs.Count, _levelIndex, 0);
+                _levelIndex = GameUtility.RandomInt(_levelPrefabs.Count);
             }
         }
         public void GenerateCurrentLevel()
@@ -48,6 +49,7 @@ namespace CC.Managers
             {
                 Destroy(_currentLevel);
             }
+
             _currentLevel = Instantiate(_levelPrefabs[_levelIndex].levelPrefab);
         }
 
@@ -70,7 +72,6 @@ namespace CC.Managers
             {
                 _levelIndex = GameUtility.RandomIntExcept(_levelPrefabs.Count, _levelIndex);
             }
-            Debug.Log(_levelIndex);
         }
         public int GetGlobalLevelIndex()
         {

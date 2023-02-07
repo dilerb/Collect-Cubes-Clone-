@@ -1,21 +1,18 @@
-using System;
+using CC.Managers.Utility;
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 namespace CC.Picker.Controller
 {
     public class JoystickController : MonoBehaviour
     {
-        [SerializeField] private Joystick joystick;
+        [SerializeField] private VirtualJoystick joystick;
         [SerializeField] private PlayerDataScriptableObject _playerData;
 
-        private bool movementEnable = true;
-
         private Rigidbody rb;
-
         private Vector3 previousDirection, currentDirection;
         private Vector3 velocity = Vector3.zero;
         private float horizontalInput, verticalInput;
+        private bool movementEnable = true;
 
         void Start()
         {
@@ -54,8 +51,8 @@ namespace CC.Picker.Controller
 
         private void GetInputs()
         {
-            horizontalInput = joystick.Horizontal;
-            verticalInput = joystick.Vertical;
+            horizontalInput = joystick.horizontal;
+            verticalInput = joystick.vertical;
         }
 
         internal void StopMovement()

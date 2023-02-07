@@ -392,6 +392,10 @@ namespace CC.Managers.Utility
             }
             return result;
         }
+        public static int RandomInt(int n)
+        {
+            return Random.Range(0, n);
+        }
 
         public static int RandomOneOrZero()
         {
