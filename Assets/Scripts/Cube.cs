@@ -28,7 +28,7 @@ namespace CC.Cube
         }
         private void OnCollisionEnter(Collision collision)
         {
-            if (collision.gameObject.CompareTag("Picker"))
+            if (collision.gameObject.CompareTag("Picker") || collision.gameObject.CompareTag("PickerAI"))
             {
                 // Preserve fall from the picker
 

@@ -9,24 +9,28 @@ namespace CC.AI.Controller
     {
         [SerializeField] private AIDataScriptableObject _aiData;
         [SerializeField] private GameObject blackHole;
-        [SerializeField] private NavMeshAgent agent;
+        //[SerializeField] private NavMeshAgent agent;
 
         private GameObject cubePool;
         private Vector3 destination;
         private bool targetCube = true;
+        private bool movementEnable = true;
+        private Rigidbody rb;
         internal void Init()
         {
+            rb = GetComponent<Rigidbody>();
             cubePool = Managers.ObjectPooler.Instance.GetCreateObjectParent();
-            agent.speed = _aiData.moveSpeed;
-            agent.angularSpeed = _aiData.rotationSpeed;
-            agent.acceleration = _aiData.acceleration;
-
             FindDestination();
         }
 
         private void Update()
         {
-            agent.SetDestination(destination);
+            if (!movementEnable)
+                return;
+
+            AIMovement();
+
+            AIRotation();
 
             if (Vector3.Distance(transform.position, destination) < _aiData.distanceBetweenDestination)
             {
@@ -34,16 +38,44 @@ namespace CC.AI.Controller
             }
         }
 
+        private void AIMovement()
+        {
+            rb.velocity = (destination - transform.position).normalized * _aiData.moveSpeed;
+            //transform.position = Vector3.MoveTowards(transform.position, destination, _aiData.moveSpeed * Time.deltaTime);
+        }
+
+        private void AIRotation()
+        {
+            transform.LookAt(destination);
+        }
+
         private void FindDestination()
         {
-            Vector3 targetCubePos = Vector3.zero;
-
-            if (cubePool.transform.childCount > 0)
+            if(targetCube)
             {
-                targetCubePos = cubePool.transform.GetChild(Random.Range(0, cubePool.transform.childCount)).position;
-            }
+                Vector3 targetCubePos = Vector3.zero;
 
-            destination = new Vector3(targetCubePos.x, transform.position.y, targetCubePos.z);
+                if (cubePool.transform.childCount > 0)
+                {
+                    targetCubePos = cubePool.transform.GetChild(Random.Range(0, cubePool.transform.childCount)).position;
+                }
+
+                destination = new Vector3(targetCubePos.x, transform.position.y, targetCubePos.z);
+
+                if (Random.Range(0, 2) == 0) // Collect another cube possibility
+                    targetCube = false;
+            }
+            else
+            {
+                destination = new Vector3(blackHole.transform.position.x, transform.position.y, blackHole.transform.position.z);
+
+                targetCube = true;
+            }
+        }
+
+        internal void StopMovement()
+        {
+            movementEnable = false;
         }
     }
 }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc3813f90643f9f439c0e5ef2bc72c5c, type: 3}
   m_Name: AIData
   m_EditorClassIdentifier: 
-  moveSpeed: 10
+  moveSpeed: 7
   rotationSpeed: 3600
   acceleration: 5
-  distanceBetweenDestination: 0.1
+  distanceBetweenDestination: 1

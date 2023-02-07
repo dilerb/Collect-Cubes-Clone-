@@ -85,6 +85,9 @@ namespace CC.Managers
             {
                 CubeSpawner.Instance.StopSpawn();
                 CheckWinLose();
+
+                if (ai != null)
+                    ai.GetComponent<AI.Controller.AIController>().StopMovement();
             }
         }
         private int GetLevel()
